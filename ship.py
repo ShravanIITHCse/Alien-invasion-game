@@ -22,11 +22,11 @@ class Ship:
 
     def update_ship(self):
         """Update ship position"""
-        if self.move_right_flag:
+        if self.move_right_flag and self.ship_rect.right < self.screen_rect.right:
             self.ship_rect.centerx += 1 * self.settings.ship_speed
-        if self.move_left_flag:
+        if self.move_left_flag and self.ship_rect.left > 0:
             self.ship_rect.centerx -= 1 * self.settings.ship_speed
 
-    def blitme(self):
+    def draw_ship(self):
         """Draw the ship at its current location"""
         self.window.blit(self.ship_image,self.ship_rect)
