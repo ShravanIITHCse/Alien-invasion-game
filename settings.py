@@ -18,3 +18,9 @@ class Settings():
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)
         self.bullet_limit = 3
+
+        # Alien settings
+        self.alien_speed = 1
+        self.alien_drop_rate = 10
+        # 1 for right and -1 for left
+        self.alien_direction = 1

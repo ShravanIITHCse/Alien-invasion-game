@@ -35,21 +35,26 @@ def check_events(ship, settings, bullets, window):
                 ship.move_left_flag = False
 
 
-def update_screen(window, settings, ship, bullets, aliens):
-    """This function will keep changing the window"""
-    # Redraw the window with this color
-    window.fill(settings.screen_color)
-    # Updates the ship and bullets position by redrawing it
-    ship.update_ship()
+def gf_update_bullet(bullets):
+    """Update all bullets of bullet group and draw the bullets"""
     for bullet in bullets:
         bullet.update_bullet()
         if bullet.bullet_rect.bottom < 0:
             bullets.remove(bullet)
         else:
             bullet.draw_bullet()
+
+
+def update_screen(window, settings, ship, bullets, aliens):
+    """This function will keep changing the window"""
+    # Redraw the window with this color
+    window.fill(settings.screen_color)
+    # Updates the ship and bullets position by redrawing it
+    ship.update_ship()
+    gf_update_bullet(bullets)
     ship.draw_ship()
-    for alien in aliens:
-        alien.draw_alien()
+    gf_update_fleet(aliens, settings)
+
     # Draws the window
     pygame.display.flip()
 
@@ -88,3 +93,24 @@ def create_alien_fleet(window, settings, aliens, ship):
     for i_index in range(number_rows):
         for j_index in range(number_aliens_x):
             create_alien(window, settings, aliens, i_index, j_index)
+
+
+def check_fleet_direction(aliens, settings):
+    for alien in aliens:
+        if alien.check_edges():
+            change_fleet_direction(aliens, settings)
+            break
+
+
+def change_fleet_direction(aliens, settings):
+    """Drop the entire fleet and change the direction of motion"""
+    for alien in aliens:
+        alien.alien_rect.y += settings.alien_drop_rate
+    settings.alien_direction *= -1
+
+
+def gf_update_fleet(aliens, settings):
+    check_fleet_direction(aliens, settings)
+    for alien in aliens:
+        alien.update_alien()
+        alien.draw_alien()
