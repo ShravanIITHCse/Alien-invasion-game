@@ -2,6 +2,7 @@
 import pygame
 import sys
 from bullet import Bullet
+from aliens import Aliens
 
 
 def keydown_events(event, ship, window, bullets, settings):
@@ -34,7 +35,7 @@ def check_events(ship, settings, bullets, window):
                 ship.move_left_flag = False
 
 
-def update_screen(window, settings, ship, bullets):
+def update_screen(window, settings, ship, bullets, aliens):
     """This function will keep changing the window"""
     # Redraw the window with this color
     window.fill(settings.screen_color)
@@ -47,5 +48,43 @@ def update_screen(window, settings, ship, bullets):
         else:
             bullet.draw_bullet()
     ship.draw_ship()
+    for alien in aliens:
+        alien.draw_alien()
     # Draws the window
     pygame.display.flip()
+
+
+def get_number_aliens_x(settings, alien_width):
+    """Gives the no. of aliens in x"""
+    available_space_x = settings.screen_width - 2 * alien_width
+    number_aliens_x = int(available_space_x / (2 * alien_width))
+    return number_aliens_x
+
+
+def get_rows(settings, alien_height, ship_height):
+    """Gives the no. of rows for the fleet"""
+    available_space_y = settings.screen_height - 3 * alien_height - ship_height
+    number_rows = int(available_space_y / (2 * alien_height))
+    return number_rows
+
+
+def create_alien(window, settings, aliens, i_index, j_index):
+    alien = Aliens(window, settings)
+    alien_width = alien.alien_rect.width
+    alien_height = alien.alien_rect.height
+    alien.alien_rect.x = alien_width + 2 * j_index * alien_width
+    alien.alien_rect.y = alien_height + 2 * i_index * alien_height
+    aliens.add(alien)
+
+
+def create_alien_fleet(window, settings, aliens, ship):
+    """Creates the alien fleet"""
+    # Create alien and find no. of aliens in row
+    alien = Aliens(window, settings)
+    number_aliens_x = get_number_aliens_x(settings, alien.alien_rect.width)
+    number_rows = get_rows(settings, alien.alien_rect.height, ship.ship_rect.height)
+
+    # Create the fleet of aliens
+    for i_index in range(number_rows):
+        for j_index in range(number_aliens_x):
+            create_alien(window, settings, aliens, i_index, j_index)
