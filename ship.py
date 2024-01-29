@@ -10,6 +10,7 @@ class Ship:
         # Load the image of the ship and get its rect
         self.ship_image = pygame.image.load('images/ship.bmp')
         self.ship_rect = self.ship_image.get_rect()
+        self.rect = self.ship_rect
         self.screen_rect = self.window.get_rect()
 
         # Flag to allow continuous movement

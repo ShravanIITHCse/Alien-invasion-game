@@ -3,6 +3,7 @@ import pygame
 import sys
 from bullet import Bullet
 from aliens import Aliens
+from time import sleep
 
 
 def keydown_events(event, ship, window, bullets, settings):
@@ -35,7 +36,7 @@ def check_events(ship, settings, bullets, window):
                 ship.move_left_flag = False
 
 
-def gf_update_bullet(bullets):
+def gf_update_bullet(bullets, aliens, window, settings, ship, stats):
     """Update all bullets of bullet group and draw the bullets"""
     for bullet in bullets:
         bullet.update_bullet()
@@ -44,16 +45,53 @@ def gf_update_bullet(bullets):
         else:
             bullet.draw_bullet()
 
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    check_repopulation(aliens, bullets, window, settings, ship, stats)
 
-def update_screen(window, settings, ship, bullets, aliens):
+
+def repopulation_loss(bullets, aliens, stats, window, settings, ship):
+    if stats.ship_left > 0:
+        # Decrement ship left
+        stats.ship_left -= 1
+        # Empty the list of aliens and bullets
+        bullets.empty()
+        aliens.empty()
+
+        # Create a new fleet and center the ship
+        create_alien_fleet(window, settings, aliens, ship)
+        ship.ship_rect.centerx = window.get_rect().centerx
+
+        # Pause
+        sleep(0.5)
+    else:
+        stats.game_active_status = False
+
+
+def check_repopulation(aliens, bullets, window, settings, ship, stats):
+    """Repopulate the fleet if there is no alien remaining"""
+    screen_rect = window.get_rect()
+    if len(aliens) == 0:
+        bullets.empty()
+        create_alien_fleet(window, settings, aliens, ship)
+
+    if pygame.sprite.spritecollideany(ship, aliens):
+        repopulation_loss(bullets, aliens, stats, window, settings, ship)
+
+    for alien in aliens:
+        if alien.alien_rect.bottom >= screen_rect.bottom:
+            repopulation_loss(bullets, aliens, stats, window, settings, ship)
+            break
+
+
+def update_screen(window, settings, ship, bullets, aliens, stats):
     """This function will keep changing the window"""
     # Redraw the window with this color
     window.fill(settings.screen_color)
     # Updates the ship and bullets position by redrawing it
     ship.update_ship()
-    gf_update_bullet(bullets)
+    gf_update_bullet(bullets, aliens, window, settings, ship, stats)
     ship.draw_ship()
-    gf_update_fleet(aliens, settings)
+    gf_update_fleet(aliens, settings, ship, bullets, window, stats)
 
     # Draws the window
     pygame.display.flip()
@@ -109,8 +147,11 @@ def change_fleet_direction(aliens, settings):
     settings.alien_direction *= -1
 
 
-def gf_update_fleet(aliens, settings):
+def gf_update_fleet(aliens, settings, ship, bullets, window, stats):
     check_fleet_direction(aliens, settings)
     for alien in aliens:
         alien.update_alien()
         alien.draw_alien()
+    check_repopulation(aliens, bullets, window, settings, ship, stats)
+    # if pygame.sprite.spritecollideany(ship, aliens):
+    #     print("Ship hit!!")

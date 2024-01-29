@@ -11,6 +11,7 @@ class Bullet(Sprite):
 
         # Create bullet at origin then shift it to its correct position
         self.bullet_rect = pygame.Rect(0, 0, settings.bullet_width, settings.bullet_height)
+        self.rect = self.bullet_rect
         self.bullet_rect.top = ship.ship_rect.top
         self.bullet_rect.centerx = ship.ship_rect.centerx
 
