@@ -6,7 +6,7 @@ from aliens import Aliens
 from time import sleep
 
 
-def keydown_events(event, ship, window, bullets, settings):
+def keydown_events(event, ship, window, bullets, settings, stats, aliens):
     if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
         ship.move_right_flag = True
     if event.key == pygame.K_LEFT or event.key == pygame.K_a:
@@ -17,9 +17,33 @@ def keydown_events(event, ship, window, bullets, settings):
         if settings.bullet_limit > len(bullets):
             new_bullet = Bullet(window, settings, ship)
             bullets.add(new_bullet)
+    if event.key == pygame.K_p:
+        start_game(stats, aliens, bullets, window, settings, ship)
 
 
-def check_events(ship, settings, bullets, window):
+def start_game(stats, aliens, bullets, window, settings, ship):
+    # Reset the game statistics
+    stats.reset_stats()
+    stats.game_active_status = True
+    pygame.mouse.set_visible(False)
+
+    # Empty list of aliens and bullets
+    aliens.empty()
+    bullets.empty()
+
+    # Create the new fleet and center the ship
+    create_alien_fleet(window, settings, aliens, ship)
+    ship.center_ship()
+
+
+def check_play_button_click(mouse_coord, play_button, stats, aliens, bullets, window, settings, ship):
+    """Start New game when player click play"""
+    button_clicked = play_button.button_rect.collidepoint(mouse_coord)
+    if button_clicked and not stats.game_active_status:
+        start_game(stats, aliens, bullets, window, settings, ship)
+
+
+def check_events(ship, settings, bullets, window, play_button, stats, aliens):
     """Check the events whichever is going to happen on windows"""
 
     # Respond to keypress events
@@ -27,13 +51,17 @@ def check_events(ship, settings, bullets, window):
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            keydown_events(event, ship, window, bullets, settings)
+            keydown_events(event, ship, window, bullets, settings, stats, aliens)
         elif event.type == pygame.KEYUP:
             # Move the ship to the right
             if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 ship.move_right_flag = False
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 ship.move_left_flag = False
+        # Check if the user press play button or not
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_coord = pygame.mouse.get_pos()
+            check_play_button_click(mouse_coord, play_button, stats, aliens, bullets, window, settings, ship)
 
 
 def gf_update_bullet(bullets, aliens, window, settings, ship, stats):
@@ -64,6 +92,7 @@ def repopulation_loss(bullets, aliens, stats, window, settings, ship):
         # Pause
         sleep(0.5)
     else:
+        pygame.mouse.set_visible(True)
         stats.game_active_status = False
 
 
@@ -83,15 +112,22 @@ def check_repopulation(aliens, bullets, window, settings, ship, stats):
             break
 
 
-def update_screen(window, settings, ship, bullets, aliens, stats):
+def update_screen(window, settings, ship, bullets, aliens, stats, play_button):
     """This function will keep changing the window"""
     # Redraw the window with this color
     window.fill(settings.screen_color)
+
     # Updates the ship and bullets position by redrawing it
-    ship.update_ship()
-    gf_update_bullet(bullets, aliens, window, settings, ship, stats)
+    if stats.game_active_status:
+        ship.update_ship()
+        gf_update_bullet(bullets, aliens, window, settings, ship, stats)
     ship.draw_ship()
     gf_update_fleet(aliens, settings, ship, bullets, window, stats)
+
+    # Draws the play button when game is inactive
+    if not stats.game_active_status:
+        window.fill(settings.pause_screen_color)
+        play_button.draw_button()
 
     # Draws the window
     pygame.display.flip()
@@ -150,7 +186,8 @@ def change_fleet_direction(aliens, settings):
 def gf_update_fleet(aliens, settings, ship, bullets, window, stats):
     check_fleet_direction(aliens, settings)
     for alien in aliens:
-        alien.update_alien()
+        if stats.game_active_status:
+            alien.update_alien()
         alien.draw_alien()
     check_repopulation(aliens, bullets, window, settings, ship, stats)
     # if pygame.sprite.spritecollideany(ship, aliens):

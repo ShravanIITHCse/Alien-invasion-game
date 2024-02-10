@@ -21,6 +21,11 @@ class Ship:
         self.ship_rect.bottom = self.screen_rect.bottom
         self.ship_rect.centerx = self.screen_rect.centerx
 
+    def center_ship(self):
+        # Fix the position of the ship
+        self.ship_rect.bottom = self.screen_rect.bottom
+        self.ship_rect.centerx = self.screen_rect.centerx
+
     def update_ship(self):
         """Update ship position"""
         if self.move_right_flag and self.ship_rect.right < self.screen_rect.right:

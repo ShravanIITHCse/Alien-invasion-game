@@ -8,6 +8,7 @@ class Settings():
         self.screen_width = 1200
         self.screen_height = 800
         self.screen_color = (230, 230, 230)
+        self.pause_screen_color = (200, 200, 200)
 
         # Ship settings
         self.ship_speed = 3
@@ -25,3 +26,11 @@ class Settings():
         self.alien_drop_rate = 10
         # 1 for right and -1 for left
         self.alien_direction = 1
+
+        # Button Settings
+        self.button_height = 50
+        self.button_width = 200
+        self.button_color = (0, 255, 0)
+        self.button_text_color = (255, 255, 255)
+        self.button_text_font_style = "arial"
+        self.button_text_size = 48

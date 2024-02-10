@@ -2,6 +2,7 @@ import pygame
 import game_functions as gf
 from settings import Settings
 from ship import Ship
+from buttons import Button
 from aliens import Aliens
 from game_stats import GameStats
 from pygame.sprite import Group
@@ -24,15 +25,16 @@ def run_game():
     # Group of bullets
     bullets = Group()
     aliens = Group()
+    # Make Play Button
+    play_button = Button(settings, window, message="Play")
 
     # Create fleet of the aliens
     gf.create_alien_fleet(window, settings, aliens, ship)
 
     # Loop which will keep the window alive till we don't do anything
     while True:
-        gf.check_events(ship, settings, bullets, window)
-        if stats.game_active_status:
-            gf.update_screen(window, settings, ship, bullets, aliens, stats)
+        gf.check_events(ship, settings, bullets, window, play_button, stats, aliens)
+        gf.update_screen(window, settings, ship, bullets, aliens, stats, play_button)
 
 
 run_game()
