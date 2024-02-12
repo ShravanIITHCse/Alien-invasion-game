@@ -34,3 +34,28 @@ class Settings():
         self.button_text_color = (255, 255, 255)
         self.button_text_font_style = "arial"
         self.button_text_size = 48
+
+        # Speedup factor
+        self.sf_bullet_speed = 1.25
+        self.sf_ship_speed = 1.25
+        self.sf_alien_speed = 1.25
+        self.sf_bullet_width = 1.25
+        self.sf_alien_points = 2
+
+        # Points
+        self.alien_points = 50
+
+    def return_to_default(self):
+        self.bullet_width = 5
+        self.ship_speed = 3
+        self.alien_speed = 1
+        self.bullet_speed = 1
+        self.alien_points = 50
+
+    def level_up(self):
+        self.alien_speed *= self.sf_alien_speed
+        self.ship_speed *= self.sf_ship_speed
+        self.bullet_speed *= self.sf_bullet_speed
+        self.bullet_width *= self.sf_bullet_width
+        self.alien_points *= self.sf_alien_points
+        # print(str(settings.alien_speed) + " " + str(settings.ship_speed) + " " + str(settings.bullet_speed))
